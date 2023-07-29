@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+
 
 import Button from '@mui/material/Button';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
-// const axiosInstance = axios.create({
-//     baseURL:'https://localhost:7032/Cards',
-// })
 
 
 interface Row {
@@ -33,9 +28,6 @@ const Table: React.FC = () => {
 
 
 
-
-
-
     // added to connect to DB
     const handleSendData = () => {
         const tableData = data.map((row) => {
@@ -44,19 +36,19 @@ const Table: React.FC = () => {
                 idSecond: row.idSecond,
                 front: row.front,
                 back: row.back,
-
-                // Add other properties as needed
             };
         });
+        console.log(tableData[0])
 
-        axios
-            .post<any, AxiosResponse>('https://localhost:7032/Cards', tableData, {
+        for (let i = 0; i < tableData.length; i++ ){
+            axios
+            .post<any, AxiosResponse>('https://localhost:7032/Cards', tableData[i], {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             })
             .then((response) => {
-                if (response.status === 200) {
+                if (response.status === 200 || response.status === 201) {
                     console.log('Data sent successfully');
                 } else {
                     console.error('Error sending data to API');
@@ -65,9 +57,46 @@ const Table: React.FC = () => {
             .catch((error) => {
                 console.error('Error sending data to API', error);
             });
+        }
+        setData([]);
     };
 
-
+    //to get a list of JSON then to create rows based on each of the data
+    const handleUpdate = () => {
+      console.log("handle update");
+      const updatedRow = {
+        id: newRow.id,
+        idSecond: newRow.idSecond,
+        front: newRow.front,
+        back: newRow.back,
+      };
+    
+      axios
+        .put<any, AxiosResponse>('https://localhost:7032/Cards', updatedRow, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then((response) => {
+          if (response.status === 200 || response.status === 201) {
+            console.log('Data updated successfully');
+            setNewRow({
+                id: 0,
+                idSecond: 0,
+                front: '',
+                back: '',
+                height: 0,
+                isEditing: false,
+              });
+          } else {
+            console.error('Error updating data');
+          }
+        })
+        .catch((error) => {
+          console.error('Error updating data', error);
+        });
+    };
+    
 
     const handleAddRow = () => {
         setData((prevData) => [...prevData, newRow]);
@@ -101,6 +130,7 @@ const Table: React.FC = () => {
             )
         );
     };
+
 
     return (
         <div>
@@ -167,11 +197,11 @@ const Table: React.FC = () => {
 
                             <td>
                                 {row.isEditing ? (
-                                    <Button variant="text" onClick={() => handleSaveRow(index)}>Save</Button>
-                                ) : (
-                                    <Button variant="text" onClick={() => handleUpdateRow(index)}>Edit</Button>
+                                    <Button variant="contained" color="primary" onClick={() => handleSaveRow(index)} >Save</Button>
+                                ) : ( 
+                                    <Button variant="contained" color="primary" onClick={() => handleUpdateRow(index)} style={{ marginRight: '10px' }} >Edit</Button>
                                 )}
-                                <Button variant="text" onClick={() => handleDeleteRow(index)}>Delete</Button>
+                                <Button variant="contained" color="primary" onClick={() => handleDeleteRow(index)}>Delete</Button>
                             </td>
                         </tr>
                     ))}
@@ -196,7 +226,6 @@ const Table: React.FC = () => {
                                 }
                             />
                         </td>
-
                         <td>
                             <textarea
                                 value={newRow.front}
@@ -220,13 +249,18 @@ const Table: React.FC = () => {
                             />
                         </td>
                         <td>
-                            <Button variant="text" onClick={handleAddRow}>Add</Button>
+                        &nbsp;
+                            <Button variant="contained" color="primary" onClick={handleAddRow}>Add</Button>
+                            &nbsp;&nbsp;
+                            <Button variant="contained" color="primary"  onClick={handleUpdate}>Update</Button><br/>
                         </td>
                     </tr>
                 </tbody>
 
             </table>
-            <button onClick={handleSendData}>Send Data</button>
+            <Button variant="contained" color="primary" onClick={handleSendData}>Send Data</Button><br/>
+            
+            
         </div>
     );
 };

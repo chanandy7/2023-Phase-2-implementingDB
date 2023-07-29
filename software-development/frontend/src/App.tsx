@@ -10,6 +10,11 @@ import { TodoList } from './stories/TodoList/TodoList';
 import MyDropzone from './components/MyDropzone';
 
 import Table from './components/Table';
+import ViewTable from './components/ViewTable';
+import InputButton from './components/InputButton';
+
+
+
 
 
 function App() {
@@ -24,7 +29,15 @@ function App() {
             <div className="App">
                 <MyDropzone />
                 <Table />
+                <div style={{ marginTop: '50px' }}>
+                    <ViewTable/>
+                </div>
+                <div style={{ marginTop: '50px', marginRight: '25px'  }}>
+                    <InputButton label = {"Deck to delete..."} endpoint= {"https://localhost:7032/Cards"} method={"DELETE"} buttonLabel ={"Delete"}/>
+                </div>
 
+
+                    
                 {/* {data!.length === 0 && <p>No Todo Lists!</p>} */}
                 {data!.map(tdl => <TodoList todoListItems={tdl.todoItemList} key={tdl.id} />)}
 
