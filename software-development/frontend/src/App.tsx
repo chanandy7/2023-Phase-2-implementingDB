@@ -28,6 +28,8 @@ function App() {
         <ThemeProvider theme={lightTheme}>
             <div className="App">
                 <MyDropzone />
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;
                 <Table />
                 <div style={{ marginTop: '50px' }}>
                     <ViewTable/>

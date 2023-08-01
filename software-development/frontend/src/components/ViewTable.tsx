@@ -17,9 +17,13 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import TableHead from '@mui/material/TableHead';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
-import InputButton from './InputButton';
-import { Button, TextField } from '@mui/material';
 
+import { Button, TextField } from '@mui/material';
+import { CsvBuilder } from 'filefy';
+
+
+// import { ExportToCsv } from 'export-to-csv';
+// import { saveAs } from 'file-saver';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -101,12 +105,34 @@ const CustomPaginationActionsTable = () => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [fetchedData, setFetchedData] = React.useState<RowData[]>([]);
 
+
   const columns = [
     { id: 'id', label: 'Deck' },
     { id: 'idSecond', label: 'ID' },
     { id: 'front', label: 'Front' },
     { id: 'back', label: 'Back' },
   ];
+
+  const handleExport = () => {
+    // Define the columns
+    const columns = ['id', 'idSecond', 'front', 'back'];
+  
+    // Extract the data from the fetchedData array
+    const data = fetchedData.map(row => [String(row.id), String(row.idSecond), row.front, row.back]);
+  
+    // Create a CsvBuilder
+    const builder = new CsvBuilder('filename.csv');
+  
+    // Configure the CsvBuilder and export the file
+    builder
+      .setDelimeter(',')
+      .setColumns(columns)
+      .addRows(data)
+      .exportFile();
+
+  };
+  
+
 
   // Avoid a layout jump when reaching the last page with empty rows.
 const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page * rowsPerPage);
@@ -135,12 +161,13 @@ const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page 
     
   
     const handleCertainDeckRequest = () => {
-      let url = API_ENDPOINT;
+      let url = 'https://localhost:7032/Cards';
        
       if (parameter !== undefined) {
         url += `/${parameter}`;
       }
       console.log(url)
+      setFetchedData([]);
   
       axios({
         method: 'GET',
@@ -202,7 +229,7 @@ const handleGetRequest = () => {
     
     
     {/* <button onClick= {handleCertainDeckRequest}>View Deck</button> */}
-      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+      <Table  sx={{ minWidth: 500 }} aria-label="custom pagination table">
       <TableHead>
           <TableRow>
           <TableCell align="left">{columns[0].label}</TableCell>
@@ -261,6 +288,8 @@ const handleGetRequest = () => {
       </Table>
       
     </TableContainer>
+    <Button variant="contained" color="primary" onClick={handleExport}>Export to CSV</Button>
+
     <div><br/></div>
     <Button variant="contained" color="primary" onClick={handleGetRequest}>Fetch All Decks</Button>
     <div><br/></div>

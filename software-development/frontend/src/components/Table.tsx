@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 
-import Button from '@mui/material/Button';
+
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
 
 
 interface Row {
@@ -17,6 +18,7 @@ interface Row {
 
 const Table: React.FC = () => {
     const [data, setData] = useState<Row[]>([]);
+
     const [newRow, setNewRow] = useState<Row>({
         id: 0,
         idSecond: 0,
@@ -26,6 +28,9 @@ const Table: React.FC = () => {
         isEditing: false,
     });
 
+    const [errorMessage, setErrorMessage] = useState('');
+    
+    
 
 
     // added to connect to DB
@@ -50,14 +55,29 @@ const Table: React.FC = () => {
             .then((response) => {
                 if (response.status === 200 || response.status === 201) {
                     console.log('Data sent successfully');
+                    console.log(response.data)
+                    // setNewRow({
+                    //     id: 0,
+                    //     idSecond: 0,
+                    //     front: '',
+                    //     back: '',
+                    //     height: 0,
+                    //     isEditing: false,
+                    //   });
                 } else {
                     console.error('Error sending data to API');
+                    console.error(response.data)
                 }
             })
             .catch((error) => {
                 console.error('Error sending data to API', error);
             });
+
         }
+        setNewRow((prevRow) => ({
+            ...prevRow,
+            id: prevRow.id + 1,
+          }));
         setData([]);
     };
 
@@ -98,10 +118,71 @@ const Table: React.FC = () => {
     };
     
 
-    const handleAddRow = () => {
-        setData((prevData) => [...prevData, newRow]);
-        setNewRow({ id: 0, idSecond: 0, front: '', back: '', height: 0, isEditing: false });
-    };
+    // const handleAddRow = () => {
+    //     setData((prevData) => [...prevData, newRow]);
+    //     setNewRow({ id: 0, idSecond: 0, front: '', back: '', height: 0, isEditing: false });
+    // };
+
+
+    const handleAddRow2 = () => {
+        // send data in the new row, before adding, if error, modal to say card already exists
+        
+
+        setData((prevData) => [
+          ...prevData,
+          { ...newRow, id: newRow.id },
+        ]);
+        setNewRow((prevRow) => ({
+          ...prevRow,
+          id: prevRow.id,
+          idSecond: prevRow.idSecond + 1,
+          front: "",
+          back: ""
+
+        }));
+      };
+
+      const handleAddRow = () => {
+        axios
+          .post<any, AxiosResponse>('https://localhost:7032/Cards', newRow, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          .then((response) => {
+            //doesnt enter here
+            console.log(response.data)
+            if (response.data.id == -1) {
+                
+                setErrorMessage("Card with same Id and IdSecond exists already, please update or change Id or IdSecond");
+                return
+            }
+            if (response.status === 200 || response.status === 201) {
+              console.log('Data sent successfully');
+              setData((prevData) => [...prevData, newRow]);
+              setNewRow({
+                id: newRow.id + 1,
+                idSecond: newRow.idSecond + 1,
+                front: '',
+                back: '',
+                height: 0,
+                isEditing: false,
+              });
+            } else {
+              console.error('Error sending data to API!!!!!!!!!!!!!!!!!!');
+              // Handle error message from the backend
+              if (response.data && response.data.error) {
+                console.error('Backend error message:', response.data.error);
+                
+              }
+            }
+          })
+          .catch((error) => {
+            console.error('Error sending data to API2', error);
+            setErrorMessage("Please make sure fields 'Id' and 'IdSecond' are numbers");
+          });
+      };
+
 
     const handleDeleteRow = (index: number) => {
         setData((prevData) => prevData.filter((_, i) => i !== index));
@@ -134,6 +215,17 @@ const Table: React.FC = () => {
 
     return (
         <div>
+                <Dialog open={!!errorMessage} onClose={() => setErrorMessage('')}>
+      <DialogTitle>Error</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{errorMessage}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setErrorMessage('')} color="primary">
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
             <table>
                 <thead>
                     <tr>
