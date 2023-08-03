@@ -34,12 +34,12 @@ const InputButton: React.FC<InputButtonProps> = ({ label, endpoint, method, butt
       }
     })
       .then((response: AxiosResponse) => {
-        // Handle successful response
+        
         setData(response.data)
         setParameter(undefined)
       })
       .catch((error: AxiosError) => {
-        // Handle error
+        
         console.error('API call error:', error);
       });
   };

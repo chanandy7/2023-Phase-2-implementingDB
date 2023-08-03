@@ -93,3 +93,12 @@
     margin-top: 20px;
 }
 
+.tableHeader {
+    font-weight: bold !important;
+    color:  #3f51b5;
+}
+
+
+#tableButton {
+    margin-top: -4px;
+}

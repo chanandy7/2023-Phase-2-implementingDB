@@ -12,8 +12,7 @@ function SignInPage2() {
   const { saveToken } = UseToken();
 
     //to keep state for modal message
-  const [errorMessage, setErrorMessage] = useState('');
-
+  const [showError, setShowError] = useState(false);
   const sessionStorage = window.sessionStorage;
 
   const handleSignIn = async () => {
@@ -23,7 +22,7 @@ function SignInPage2() {
         password
       });
     //   does not go pass here if it fails
-      console.log("hi")
+      
       if (response.status === 200) {
         // Authentication successful
         const token = response.data.token;
@@ -34,39 +33,20 @@ function SignInPage2() {
         window.location.reload();
 
       
-      // Authentication successful
-      // Set the user as logged in or store the authentication token in local storage
+
       console.log("success")
       }
 
     } catch (error) {
         console.log("login failed")
-        setErrorMessage("ERROR")
-        return (
-            <div>
-                <Dialog open={!!errorMessage} onClose={() => setErrorMessage('')}>
-                    <DialogTitle>Error</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>{errorMessage}</DialogContentText>
-                        </DialogContent>
-                            <DialogActions>
-                                <Button onClick={() => setErrorMessage('')} color="primary">
-                                    Close
-                                </Button>
-                            </DialogActions>
-                </Dialog>
-            </div>
-
-        )
-      // Authentication failed
-      // Handle the error, e.g., show an error message to the user
+        setShowError(true);
     }
   }
 
   return (
     <div >
         <Typography variant="h6" className="center-align">Client Login</Typography>
-    
+        <br/>
     <div >
       
       <TextField
@@ -95,6 +75,10 @@ function SignInPage2() {
         Sign in
       </Button>
       </div>
+      <br/>
+      {showError && <Typography variant="body1" className="center-align" style={{ color: 'red' }}>Login failed</Typography>}
+
+
     </div>
   );
 }

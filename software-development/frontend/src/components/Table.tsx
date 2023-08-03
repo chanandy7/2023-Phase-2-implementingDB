@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button , Typography} from '@material-ui/core';
 
@@ -13,6 +13,7 @@ interface Row {
 }
 
 const Table: React.FC = () => {
+    const token = sessionStorage.getItem('token');
     const [data, setData] = useState<Row[]>([]);
 
     const [newRow, setNewRow] = useState<Row>({
@@ -72,6 +73,7 @@ const Table: React.FC = () => {
         setData([]);
     };
 
+
     //to get a list of JSON then to create rows based on each of the data
     const handleUpdate = () => {
       console.log("handle update");
@@ -110,36 +112,17 @@ const Table: React.FC = () => {
     };
     
 
-    // const handleAddRow = () => {
-    //     setData((prevData) => [...prevData, newRow]);
-    //     setNewRow({ id: 0, idSecond: 0, front: '', back: '', height: 0, isEditing: false });
-    // };
 
-
-    // const handleAddRow2 = () => {
-    //     // send data in the new row, before adding, if error, modal to say card already exists
-        
-
-    //     setData((prevData) => [
-    //       ...prevData,
-    //       { ...newRow, id: newRow.id },
-    //     ]);
-    //     setNewRow((prevRow) => ({
-    //       ...prevRow,
-    //       id: prevRow.id,
-    //       idSecond: prevRow.idSecond + 1,
-    //       front: "",
-    //       back: ""
-
-    //     }));
-    //   };
-
-
-    //necessary part of the headers
-
-      const token = sessionStorage.getItem('token');
+      
 // revised "add"
       const handleAddRow = () => {
+        if (Number.isNaN(newRow.id) || Number.isNaN(newRow.idSecond)){
+            console.log("entered the error, to stop")
+            setErrorMessage(
+                "Card 'id' and 'idSecond' needs to be a number."
+              );
+              return;
+        }
         const newData = {
           ...newRow,
           user: user
@@ -191,7 +174,7 @@ const Table: React.FC = () => {
               });
             } else {
               console.error('Error retrieving data from API!');
-              // Handle error message from the backend
+              
               if (response.data && response.data.error) {
                 console.error('Backend error message:', response.data.error);
               }
@@ -205,55 +188,6 @@ const Table: React.FC = () => {
           });
       };
       
-
-    //   const handleAddRow = () => {
-    //       const newData = {
-    //         ...newRow,
-    //         user: user
-    //       };
-    //     axios
-    //       .get<any, AxiosResponse>('https://localhost:7032/Cards', {
-    //         headers: {
-              
-    //           Authorization: `Bearer ${token}`
-    //         },
-    //         params: newData
-    //       })
-    //       .then((response) => {
-    //         //doesnt enter here
-    //         console.log(response.data)
-    //         if (response.data.id == -1) {
-                
-    //             setErrorMessage("Card with same Id and IdSecond exists already, please update or change Id or IdSecond");
-    //             return
-    //         }
-    //         if (response.status === 200 || response.status === 201) {
-    //           console.log('Data sent successfully');
-    //           setData((prevData) => [...prevData, newRow]);
-    //           setNewRow({
-    //             id: newRow.id + 1,
-    //             idSecond: newRow.idSecond + 1,
-    //             front: '',
-    //             back: '',
-    //             height: 0,
-    //             isEditing: false,
-    //           });
-    //         } else {
-    //           console.error('Error sending data to API!!!!!!!!!!!!!!!!!!');
-    //           // Handle error message from the backend
-    //           if (response.data && response.data.error) {
-    //             console.error('Backend error message:', response.data.error);
-                
-    //           }
-    //         }
-    //       })
-    //       .catch((error) => {
-    //         console.error('Error sending data to API2', error);
-    //         setErrorMessage("Please make sure fields 'Id' and 'IdSecond' are numbers");
-    //       });
-    //   };
-
-
     const handleDeleteRow = (index: number) => {
         setData((prevData) => prevData.filter((_, i) => i !== index));
     };
@@ -299,11 +233,11 @@ const Table: React.FC = () => {
             <table>
                 <thead>
                     <tr>
-                        <th><Typography variant="subtitle1">Id</Typography></th>
-                        <th><Typography variant="subtitle1">IdSecond</Typography></th>
-                        <th><Typography variant="subtitle1">Front</Typography></th>
-                        <th><Typography variant="subtitle1">Back</Typography></th>
-                        <th><Typography variant="subtitle1">Actions</Typography></th>
+                        <th><Typography variant="subtitle1" className='tableHeader'>Id</Typography></th>
+                        <th><Typography variant="subtitle1" className='tableHeader'>IdSecond</Typography></th>
+                        <th><Typography variant="subtitle1" className='tableHeader'>Front</Typography></th>
+                        <th><Typography variant="subtitle1" className='tableHeader'>Back</Typography></th>
+                        <th><Typography variant="subtitle1" className='tableHeader'>Actions</Typography></th>
                     </tr>
                 </thead>
 
@@ -317,7 +251,7 @@ const Table: React.FC = () => {
                                         onChange={(e) =>
                                             handleChange(index, 'id', e.target.value)
                                         }
-                                        style={{ outlineColor: '#002349' }}
+
                                     />
                                 ) : (
                                     <span>{row.id}</span>
@@ -413,9 +347,9 @@ const Table: React.FC = () => {
                         </td>
                         <td>
                         &nbsp;
-                            <Button variant="contained" className='standardButton' onClick={handleAddRow}>Add</Button>
+                            <Button variant="contained" className='standardButton' id= 'tableButton' onClick={handleAddRow}>Add</Button>
                             &nbsp;&nbsp;
-                            <Button variant="contained" className='standardButton'  onClick={handleUpdate}>Update</Button><br/>
+                            <Button variant="contained" className='standardButton' id= 'tableButton' onClick={handleUpdate}>Update</Button><br/>
                         </td>
                     </tr>
                 </tbody>

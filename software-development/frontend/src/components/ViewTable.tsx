@@ -115,13 +115,13 @@ const CustomPaginationActionsTable = () => {
   ];
 
   const handleExport = () => {
-    // Define the columns
+    
     const columns = ['id', 'idSecond', 'front', 'back'];
   
-    // Extract the data from the fetchedData array
+    
     const data = fetchedData.map(row => [String(row.id), String(row.idSecond), row.front, row.back]);
   
-    // Create a CsvBuilder
+    
     const builder = new CsvBuilder('filename.csv');
   
     // Configure the CsvBuilder and export the file
@@ -135,7 +135,7 @@ const CustomPaginationActionsTable = () => {
   
 
 
-  // Avoid a layout jump when reaching the last page with empty rows.
+ 
 const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page * rowsPerPage);
 
 
@@ -179,13 +179,13 @@ const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page 
         }
       })
         .then((response: AxiosResponse) => {
-          // Handle successful response
+          
           console.log('API call successful:', response.data);
           setFetchedData(response.data); 
         //   setParameter(undefined)
         })
         .catch((error: AxiosError) => {
-          // Handle error
+          
           console.error('API call error:', error);
         });
     };
@@ -218,12 +218,12 @@ const handleGetRequest = () => {
     Authorization: `Bearer ${token}`
   }})
     .then((response) => {
-      // Handle the response data
+      
       console.log(response.data);
       setFetchedData(response.data); 
     })
     .catch((error) => {
-      // Handle any errors
+      
       console.error(error);
     });
 };
@@ -233,10 +233,6 @@ const handleGetRequest = () => {
   return (
     <div>
     <TableContainer component={Paper}>
-    
-    
-    
-    {/* <button onClick= {handleCertainDeckRequest}>View Deck</button> */}
       <Table  sx={{ minWidth: 500 }} aria-label="custom pagination table">
       <TableHead>
           <TableRow>
@@ -252,7 +248,7 @@ const handleGetRequest = () => {
             : fetchedData
           ).map((row) => (
             <TableRow key={row.id}>
-              {/* <TableCell component="th" scope="row"> */}
+              
               <TableCell style={{ width: 10 }} align="left">
                 {row.id}
               </TableCell>
@@ -296,7 +292,7 @@ const handleGetRequest = () => {
       </Table>
       
     </TableContainer>
-    <Button id = 'buttonSeparator' variant="contained" className='standardButton' onClick={handleExport}>Export to CSV</Button>
+    <Button id = 'buttonSeparator' variant="contained" className='standardButton' onClick={handleExport}>Export as CSV</Button>
 
     
     <Button id = 'buttonSeparator' variant="contained" className='standardButton' onClick={handleGetRequest}>Fetch All Decks</Button>
