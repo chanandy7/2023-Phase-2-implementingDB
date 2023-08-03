@@ -1,10 +1,6 @@
 import React, { useState, useRef } from 'react';
-
-
-
 import axios, { AxiosError, AxiosResponse } from 'axios';
-
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button , Typography} from '@material-ui/core';
 
 
 interface Row {
@@ -29,10 +25,10 @@ const Table: React.FC = () => {
     });
 
     const [errorMessage, setErrorMessage] = useState('');
-    
-    
-
-
+    const user = {
+        "username":'',
+        "password": ''
+      };
     // added to connect to DB
     const handleSendData = () => {
         const tableData = data.map((row) => {
@@ -41,6 +37,7 @@ const Table: React.FC = () => {
                 idSecond: row.idSecond,
                 front: row.front,
                 back: row.back,
+                user: user
             };
         });
         console.log(tableData[0])
@@ -50,20 +47,14 @@ const Table: React.FC = () => {
             .post<any, AxiosResponse>('https://localhost:7032/Cards', tableData[i], {
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
             })
             .then((response) => {
                 if (response.status === 200 || response.status === 201) {
                     console.log('Data sent successfully');
                     console.log(response.data)
-                    // setNewRow({
-                    //     id: 0,
-                    //     idSecond: 0,
-                    //     front: '',
-                    //     back: '',
-                    //     height: 0,
-                    //     isEditing: false,
-                    //   });
+
                 } else {
                     console.error('Error sending data to API');
                     console.error(response.data)
@@ -95,6 +86,7 @@ const Table: React.FC = () => {
         .put<any, AxiosResponse>('https://localhost:7032/Cards', updatedRow, {
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
           },
         })
         .then((response) => {
@@ -124,44 +116,73 @@ const Table: React.FC = () => {
     // };
 
 
-    const handleAddRow2 = () => {
-        // send data in the new row, before adding, if error, modal to say card already exists
+    // const handleAddRow2 = () => {
+    //     // send data in the new row, before adding, if error, modal to say card already exists
         
 
-        setData((prevData) => [
-          ...prevData,
-          { ...newRow, id: newRow.id },
-        ]);
-        setNewRow((prevRow) => ({
-          ...prevRow,
-          id: prevRow.id,
-          idSecond: prevRow.idSecond + 1,
-          front: "",
-          back: ""
+    //     setData((prevData) => [
+    //       ...prevData,
+    //       { ...newRow, id: newRow.id },
+    //     ]);
+    //     setNewRow((prevRow) => ({
+    //       ...prevRow,
+    //       id: prevRow.id,
+    //       idSecond: prevRow.idSecond + 1,
+    //       front: "",
+    //       back: ""
 
-        }));
-      };
+    //     }));
+    //   };
 
+
+    //necessary part of the headers
+
+      const token = sessionStorage.getItem('token');
+// revised "add"
       const handleAddRow = () => {
+        const newData = {
+          ...newRow,
+          user: user
+        };
         axios
-          .post<any, AxiosResponse>('https://localhost:7032/Cards', newRow, {
+          .get<any, AxiosResponse>('https://localhost:7032/Cards', {
             headers: {
-              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
             },
-          })
+            params: newData
+          }) 
           .then((response) => {
-            //doesnt enter here
-            console.log(response.data)
-            if (response.data.id == -1) {
-                
-                setErrorMessage("Card with same Id and IdSecond exists already, please update or change Id or IdSecond");
-                return
+            console.log(response.data);
+            if (response.data.length > 0) {
+              const cardExists = response.data.some(
+                (card: any) => card.id === newData.id && card.idSecond === newData.idSecond
+              );
+              if (cardExists) {
+                setErrorMessage(
+                  "Card with same 'id' and 'idSecond' exists already, please update or change 'id' or 'idSecond'."
+                );
+                return;
+              }
             }
             if (response.status === 200 || response.status === 201) {
-              console.log('Data sent successfully');
+              console.log('Data retrieved successfully');
+              console.log(data)
+              //need to check if the card exists in the about to send lot
+              for (const toSendCard of data){
+                console.log(newRow)
+                console.log(toSendCard)
+                if (newRow.id === toSendCard.id && newRow.idSecond === toSendCard.idSecond){
+                    console.log("entered")
+                    setErrorMessage(
+                        "Card with same 'id' and 'idSecond' exists already, please update or change 'id' or 'idSecond'."
+                      );
+                      return;
+
+                }
+              }
               setData((prevData) => [...prevData, newRow]);
               setNewRow({
-                id: newRow.id + 1,
+                id: newRow.id,
                 idSecond: newRow.idSecond + 1,
                 front: '',
                 back: '',
@@ -169,19 +190,68 @@ const Table: React.FC = () => {
                 isEditing: false,
               });
             } else {
-              console.error('Error sending data to API!!!!!!!!!!!!!!!!!!');
+              console.error('Error retrieving data from API!');
               // Handle error message from the backend
               if (response.data && response.data.error) {
                 console.error('Backend error message:', response.data.error);
-                
               }
             }
           })
           .catch((error) => {
-            console.error('Error sending data to API2', error);
-            setErrorMessage("Please make sure fields 'Id' and 'IdSecond' are numbers");
+            console.error('Error retrieving data from API!', error);
+            setErrorMessage(
+              "Please make sure fields 'id' and 'idSecond' are numbers."
+            );
           });
       };
+      
+
+    //   const handleAddRow = () => {
+    //       const newData = {
+    //         ...newRow,
+    //         user: user
+    //       };
+    //     axios
+    //       .get<any, AxiosResponse>('https://localhost:7032/Cards', {
+    //         headers: {
+              
+    //           Authorization: `Bearer ${token}`
+    //         },
+    //         params: newData
+    //       })
+    //       .then((response) => {
+    //         //doesnt enter here
+    //         console.log(response.data)
+    //         if (response.data.id == -1) {
+                
+    //             setErrorMessage("Card with same Id and IdSecond exists already, please update or change Id or IdSecond");
+    //             return
+    //         }
+    //         if (response.status === 200 || response.status === 201) {
+    //           console.log('Data sent successfully');
+    //           setData((prevData) => [...prevData, newRow]);
+    //           setNewRow({
+    //             id: newRow.id + 1,
+    //             idSecond: newRow.idSecond + 1,
+    //             front: '',
+    //             back: '',
+    //             height: 0,
+    //             isEditing: false,
+    //           });
+    //         } else {
+    //           console.error('Error sending data to API!!!!!!!!!!!!!!!!!!');
+    //           // Handle error message from the backend
+    //           if (response.data && response.data.error) {
+    //             console.error('Backend error message:', response.data.error);
+                
+    //           }
+    //         }
+    //       })
+    //       .catch((error) => {
+    //         console.error('Error sending data to API2', error);
+    //         setErrorMessage("Please make sure fields 'Id' and 'IdSecond' are numbers");
+    //       });
+    //   };
 
 
     const handleDeleteRow = (index: number) => {
@@ -229,17 +299,17 @@ const Table: React.FC = () => {
             <table>
                 <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>IdSecond</th>
-                        <th>Front</th>
-                        <th>Back</th>
-                        <th>Actions</th>
+                        <th><Typography variant="subtitle1">Id</Typography></th>
+                        <th><Typography variant="subtitle1">IdSecond</Typography></th>
+                        <th><Typography variant="subtitle1">Front</Typography></th>
+                        <th><Typography variant="subtitle1">Back</Typography></th>
+                        <th><Typography variant="subtitle1">Actions</Typography></th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {data.map((row, index) => (
-                        <tr key={index} style={{ height: `${row.height}px` }}>
+                        <tr key={index} style={{ height: `${row.height}px`}}>
                             <td>
                                 {row.isEditing ? (
                                     <textarea
@@ -247,6 +317,7 @@ const Table: React.FC = () => {
                                         onChange={(e) =>
                                             handleChange(index, 'id', e.target.value)
                                         }
+                                        style={{ outlineColor: '#002349' }}
                                     />
                                 ) : (
                                     <span>{row.id}</span>
@@ -342,9 +413,9 @@ const Table: React.FC = () => {
                         </td>
                         <td>
                         &nbsp;
-                            <Button variant="contained" color="primary" onClick={handleAddRow}>Add</Button>
+                            <Button variant="contained" className='standardButton' onClick={handleAddRow}>Add</Button>
                             &nbsp;&nbsp;
-                            <Button variant="contained" color="primary"  onClick={handleUpdate}>Update</Button><br/>
+                            <Button variant="contained" className='standardButton'  onClick={handleUpdate}>Update</Button><br/>
                         </td>
                     </tr>
                 </tbody>
