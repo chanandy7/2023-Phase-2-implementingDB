@@ -17,17 +17,17 @@ function SignInPage2() {
 
   const handleSignIn = async () => {
     try {
-      const response = await axios.post('https://localhost:7032/Authentication/signin', {
+      const response = await axios.post('https://cards2api.azurewebsites.net/Authentication/signin', {
         username,
         password
       });
-    //   does not go pass here if it fails
+    
       
       if (response.status === 200) {
         // Authentication successful
         const token = response.data.token;
         saveToken(token);
-        sessionStorage.setItem('token', token); // Store the token in session storage
+        sessionStorage.setItem('token', token); 
         console.log(sessionStorage)
         // Refresh the page
         window.location.reload();
