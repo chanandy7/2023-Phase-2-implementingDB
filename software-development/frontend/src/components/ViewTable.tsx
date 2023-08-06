@@ -22,8 +22,7 @@ import { Button, TextField } from '@mui/material';
 import { CsvBuilder } from 'filefy';
 
 
-// import { ExportToCsv } from 'export-to-csv';
-// import { saveAs } from 'file-saver';
+
 
 interface TablePaginationActionsProps {
   count: number;
@@ -34,6 +33,8 @@ interface TablePaginationActionsProps {
     newPage: number,
   ) => void;
 }
+
+// const token = sessionStorage.getItem('token');
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();
@@ -114,13 +115,13 @@ const CustomPaginationActionsTable = () => {
   ];
 
   const handleExport = () => {
-    // Define the columns
+    
     const columns = ['id', 'idSecond', 'front', 'back'];
   
-    // Extract the data from the fetchedData array
+    
     const data = fetchedData.map(row => [String(row.id), String(row.idSecond), row.front, row.back]);
   
-    // Create a CsvBuilder
+    
     const builder = new CsvBuilder('filename.csv');
   
     // Configure the CsvBuilder and export the file
@@ -134,7 +135,7 @@ const CustomPaginationActionsTable = () => {
   
 
 
-  // Avoid a layout jump when reaching the last page with empty rows.
+ 
 const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page * rowsPerPage);
 
 
@@ -157,10 +158,11 @@ const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page 
 
   const DeckButton: React.FC = () => {
 
-    const [parameter, setParameter] = React.useState<number | undefined>(undefined);
+  const [parameter, setParameter] = React.useState<number | undefined>(undefined);
     
   
     const handleCertainDeckRequest = () => {
+      const token = sessionStorage.getItem('token');
       let url = 'https://localhost:7032/Cards';
        
       if (parameter !== undefined) {
@@ -172,15 +174,18 @@ const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page 
       axios({
         method: 'GET',
         url: url,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
         .then((response: AxiosResponse) => {
-          // Handle successful response
+          
           console.log('API call successful:', response.data);
           setFetchedData(response.data); 
         //   setParameter(undefined)
         })
         .catch((error: AxiosError) => {
-          // Handle error
+          
           console.error('API call error:', error);
         });
     };
@@ -194,9 +199,9 @@ const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page 
   
   
     return (
-      <div style={{  marginRight: '40px'}}>
-        <TextField label="Deck to check..." variant="outlined" value={parameter || ''} onChange={handleInputChange}/>&nbsp;
-        <Button variant="contained" color="primary" onClick={handleCertainDeckRequest}>
+      <div id= 'buttonTopSeparator' style={{  marginRight: '40px'}}>
+        <TextField label="Deck to check..." size="small" variant="outlined" value={parameter || ''} onChange={handleInputChange}/>&nbsp;
+        <Button  variant="contained" className='standardButton'  onClick={handleCertainDeckRequest}>
           View
         </Button>
       </div>
@@ -208,14 +213,17 @@ const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page 
 
 
 const handleGetRequest = () => {
-  axios.get(API_ENDPOINT)
+  const token = sessionStorage.getItem('token');
+  axios.get(API_ENDPOINT, { headers: {
+    Authorization: `Bearer ${token}`
+  }})
     .then((response) => {
-      // Handle the response data
+      
       console.log(response.data);
       setFetchedData(response.data); 
     })
     .catch((error) => {
-      // Handle any errors
+      
       console.error(error);
     });
 };
@@ -225,10 +233,6 @@ const handleGetRequest = () => {
   return (
     <div>
     <TableContainer component={Paper}>
-    
-    
-    
-    {/* <button onClick= {handleCertainDeckRequest}>View Deck</button> */}
       <Table  sx={{ minWidth: 500 }} aria-label="custom pagination table">
       <TableHead>
           <TableRow>
@@ -244,7 +248,7 @@ const handleGetRequest = () => {
             : fetchedData
           ).map((row) => (
             <TableRow key={row.id}>
-              {/* <TableCell component="th" scope="row"> */}
+              
               <TableCell style={{ width: 10 }} align="left">
                 {row.id}
               </TableCell>
@@ -288,11 +292,11 @@ const handleGetRequest = () => {
       </Table>
       
     </TableContainer>
-    <Button variant="contained" color="primary" onClick={handleExport}>Export to CSV</Button>
+    <Button id = 'buttonSeparator' variant="contained" className='standardButton' onClick={handleExport}>Export as CSV</Button>
 
-    <div><br/></div>
-    <Button variant="contained" color="primary" onClick={handleGetRequest}>Fetch All Decks</Button>
-    <div><br/></div>
+    
+    <Button id = 'buttonSeparator' variant="contained" className='standardButton' onClick={handleGetRequest}>Fetch All Decks</Button>
+    
     <DeckButton/>
     </div>
     

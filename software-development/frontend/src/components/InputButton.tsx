@@ -18,26 +18,28 @@ const InputButton: React.FC<InputButtonProps> = ({ label, endpoint, method, butt
   const [data, setData] = useState<any>(null);
 
   const handleButtonClick = () => {
+    const token = sessionStorage.getItem('token');
     let url = endpoint;
     if (method === 'DELETE' && parameter !== undefined) {
       url += `?id=${parameter}`;
     }
-    if (method === 'GET' && parameter !== undefined) {
-      url += `/${parameter}`;
-    }
+
     console.log(url)
 
     axios({
       method: method,
       url: url,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
       .then((response: AxiosResponse) => {
-        // Handle successful response
+        
         setData(response.data)
         setParameter(undefined)
       })
       .catch((error: AxiosError) => {
-        // Handle error
+        
         console.error('API call error:', error);
       });
   };
@@ -51,9 +53,9 @@ const InputButton: React.FC<InputButtonProps> = ({ label, endpoint, method, butt
 
   return (
     <div>
-      <TextField label={label} variant="outlined" value={parameter || ''} onChange={handleInputChange}/>
+      <TextField label={label} variant="outlined" size="small" value={parameter || ''} onChange={handleInputChange}/>
       &nbsp;
-      <Button variant="contained" color="primary" onClick={handleButtonClick}>
+      <Button variant="contained" className='standardButton'  onClick={handleButtonClick}>
         {buttonLabel}
       </Button>
     </div>
