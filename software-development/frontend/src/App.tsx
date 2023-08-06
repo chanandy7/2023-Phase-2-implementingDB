@@ -46,7 +46,7 @@ function App() {
                     <ViewTable/>
                 </div>
                 <div style={{ marginTop: '20px', marginRight: '25px'  }}>
-                    <InputButton label = {"Deck to delete..."} endpoint= {"https://localhost:7032/Cards"} method={"DELETE"} buttonLabel ={"Delete"} />
+                    <InputButton label = {"Deck to delete..."} endpoint= {"https://cards2api.azurewebsites.net/Cards"} method={"DELETE"} buttonLabel ={"Delete"} />
                 </div>
 
 
