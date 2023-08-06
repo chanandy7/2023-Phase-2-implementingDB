@@ -16,7 +16,7 @@ function MyDropzone() {
 
         const formData = new FormData();
         formData.append('file', acceptedFiles[0]);
-        axios.post('https://localhost:7032/api/home', formData, {
+        axios.post('https://cards2api.azurewebsites.net/api/home', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

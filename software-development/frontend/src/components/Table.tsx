@@ -45,7 +45,7 @@ const Table: React.FC = () => {
 
         for (let i = 0; i < tableData.length; i++ ){
             axios
-            .post<any, AxiosResponse>('https://localhost:7032/Cards', tableData[i], {
+            .post<any, AxiosResponse>('https://cards2api.azurewebsites.net/Cards', tableData[i], {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -85,7 +85,7 @@ const Table: React.FC = () => {
       };
     
       axios
-        .put<any, AxiosResponse>('https://localhost:7032/Cards', updatedRow, {
+        .put<any, AxiosResponse>('https://cards2api.azurewebsites.net/Cards', updatedRow, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
@@ -128,7 +128,7 @@ const Table: React.FC = () => {
           user: user
         };
         axios
-          .get<any, AxiosResponse>('https://localhost:7032/Cards', {
+          .get<any, AxiosResponse>('https://cards2api.azurewebsites.net/Cards', {
             headers: {
               Authorization: `Bearer ${token}`
             },

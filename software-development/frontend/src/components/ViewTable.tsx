@@ -154,7 +154,7 @@ const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page 
     setPage(0);
   };
 
-  const API_ENDPOINT = 'https://localhost:7032/Cards';
+  const API_ENDPOINT = 'https://cards2api.azurewebsites.net/Cards';
 
   const DeckButton: React.FC = () => {
 
@@ -163,7 +163,7 @@ const emptyRows = rowsPerPage - Math.min(rowsPerPage, fetchedData.length - page 
   
     const handleCertainDeckRequest = () => {
       const token = sessionStorage.getItem('token');
-      let url = 'https://localhost:7032/Cards';
+      let url = 'https://cards2api.azurewebsites.net/Cards';
        
       if (parameter !== undefined) {
         url += `/${parameter}`;
